@@ -77,25 +77,16 @@ export function ApprovalFlow({
           </Card>
         )}
 
-        {/* Exit buttons for the success/submitted page */}
+        {/* Navigation buttons for the success/submitted page */}
         <div className="flex justify-between pt-6">
-          <div className="flex space-x-3">
-            <Button
-              variant="outline"
-              onClick={() => (window.location.href = "/")}
-              className="px-8 py-3 rounded-xl text-base h-auto border-gray-200 flex items-center space-x-2 text-red-600 border-red-200 hover:bg-red-50"
-            >
-              <span>Exit</span>
-            </Button>
-            <Button
-              variant="outline"
-              onClick={onSelectMoreEmployees}
-              className="px-8 py-3 rounded-xl text-base h-auto border-gray-200 flex items-center space-x-2"
-            >
-              <Users className="h-4 w-4" />
-              <span>Select More Employees to Edit</span>
-            </Button>
-          </div>
+          <Button
+            variant="outline"
+            onClick={onSelectMoreEmployees}
+            className="px-8 py-3 rounded-xl text-base h-auto border-gray-200 flex items-center space-x-2"
+          >
+            <Users className="h-4 w-4" />
+            <span>Select More Employees to Edit</span>
+          </Button>
           <Button
             onClick={() => (window.location.href = "/")}
             className="bg-green-500 hover:bg-green-600 text-white font-semibold px-8 py-3 rounded-xl text-base h-auto"
