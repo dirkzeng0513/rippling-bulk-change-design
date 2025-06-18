@@ -5,16 +5,23 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { CheckCircle, Clock, MessageSquare, User } from "lucide-react"
+import { CheckCircle, Clock, MessageSquare, User, Users } from "lucide-react"
 
 interface ApprovalFlowProps {
   selectedEmployees: string[]
   selectedFields: string[]
   changeData: any
   onBack: () => void
+  onSelectMoreEmployees: () => void
 }
 
-export function ApprovalFlow({ selectedEmployees, selectedFields, changeData, onBack }: ApprovalFlowProps) {
+export function ApprovalFlow({
+  selectedEmployees,
+  selectedFields,
+  changeData,
+  onBack,
+  onSelectMoreEmployees,
+}: ApprovalFlowProps) {
   const [submissionStatus, setSubmissionStatus] = useState<"pending" | "submitted">("pending")
 
   const sensitiveFields = ["baseCompensation", "bonusTarget", "level"]
@@ -69,6 +76,33 @@ export function ApprovalFlow({ selectedEmployees, selectedFields, changeData, on
             </CardContent>
           </Card>
         )}
+
+        {/* Exit buttons for the success/submitted page */}
+        <div className="flex justify-between pt-6">
+          <div className="flex space-x-3">
+            <Button
+              variant="outline"
+              onClick={() => (window.location.href = "/")}
+              className="px-8 py-3 rounded-xl text-base h-auto border-gray-200 flex items-center space-x-2 text-red-600 border-red-200 hover:bg-red-50"
+            >
+              <span>Exit</span>
+            </Button>
+            <Button
+              variant="outline"
+              onClick={onSelectMoreEmployees}
+              className="px-8 py-3 rounded-xl text-base h-auto border-gray-200 flex items-center space-x-2"
+            >
+              <Users className="h-4 w-4" />
+              <span>Select More Employees to Edit</span>
+            </Button>
+          </div>
+          <Button
+            onClick={() => (window.location.href = "/")}
+            className="bg-green-500 hover:bg-green-600 text-white font-semibold px-8 py-3 rounded-xl text-base h-auto"
+          >
+            Done
+          </Button>
+        </div>
       </div>
     )
   }
@@ -198,9 +232,26 @@ export function ApprovalFlow({ selectedEmployees, selectedFields, changeData, on
       </Card>
 
       <div className="flex justify-between">
-        <Button variant="outline" onClick={onBack} className="px-8 py-3 rounded-xl text-base h-auto border-gray-200">
-          Back to Preview
-        </Button>
+        <div className="flex space-x-3">
+          <Button
+            variant="outline"
+            onClick={() => (window.location.href = "/")}
+            className="px-8 py-3 rounded-xl text-base h-auto border-gray-200 flex items-center space-x-2 text-red-600 border-red-200 hover:bg-red-50"
+          >
+            <span>Exit</span>
+          </Button>
+          <Button
+            variant="outline"
+            onClick={onSelectMoreEmployees}
+            className="px-8 py-3 rounded-xl text-base h-auto border-gray-200 flex items-center space-x-2"
+          >
+            <Users className="h-4 w-4" />
+            <span>Select More Employees to Edit</span>
+          </Button>
+          <Button variant="outline" onClick={onBack} className="px-8 py-3 rounded-xl text-base h-auto border-gray-200">
+            Back to Preview
+          </Button>
+        </div>
         <Button
           onClick={handleSubmit}
           className="bg-amber-400 hover:bg-amber-500 text-gray-900 font-semibold px-8 py-3 rounded-xl text-base h-auto"

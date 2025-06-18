@@ -103,6 +103,7 @@ export default function UpdateEmployeeInformationPage() {
               selectedFields={selectedFields}
               changeData={changeData}
               onBack={() => setCurrentStep(3)}
+              onSelectMoreEmployees={() => setCurrentStep(1)}
             />
           )}
         </div>
