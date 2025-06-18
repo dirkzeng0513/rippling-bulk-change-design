@@ -70,23 +70,34 @@ export function ChangePreview({ selectedEmployees, changeData, onBack, onConfirm
   }
 
   return (
-    <div className="space-y-6">
-      <div className="bg-white rounded-lg shadow">
-        <div className="px-6 py-4 border-b border-gray-200">
+    <div className="space-y-8">
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        <div className="px-8 py-6 border-b border-gray-100">
           <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-lg font-medium text-gray-900">Review & Confirm Changes</h2>
-              <p className="text-sm text-gray-500">
-                Please review all changes before applying them to the selected employees
-              </p>
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center">
+                <CheckCircle className="h-5 w-5 text-amber-600" />
+              </div>
+              <div>
+                <h2 className="text-2xl font-semibold text-gray-900">Review & confirm changes</h2>
+                <p className="text-gray-600">
+                  Please review all changes before applying them to the selected employees
+                </p>
+              </div>
             </div>
-            <div className="flex items-center space-x-2">
-              <Badge variant="outline" className="flex items-center space-x-1">
-                <Users className="h-3 w-3" />
+            <div className="flex items-center space-x-3">
+              <Badge
+                variant="outline"
+                className="flex items-center space-x-2 bg-gray-50 text-gray-700 border-gray-200 px-4 py-2"
+              >
+                <Users className="h-4 w-4" />
                 <span>{selectedEmployees.length} employees</span>
               </Badge>
-              <Badge variant="outline" className="flex items-center space-x-1">
-                <Clock className="h-3 w-3" />
+              <Badge
+                variant="outline"
+                className="flex items-center space-x-2 bg-amber-50 text-amber-700 border-amber-200 px-4 py-2"
+              >
+                <Clock className="h-4 w-4" />
                 <span>{changes.length} changes</span>
               </Badge>
             </div>
@@ -94,16 +105,16 @@ export function ChangePreview({ selectedEmployees, changeData, onBack, onConfirm
         </div>
 
         <div className="p-6 space-y-6">
-          <Alert>
-            <AlertTriangle className="h-4 w-4" />
-            <AlertDescription>
+          <Alert className="border-amber-200 bg-amber-50 rounded-xl">
+            <AlertTriangle className="h-5 w-5 text-amber-600" />
+            <AlertDescription className="text-amber-800">
               <strong>Important:</strong> These changes will be applied immediately and may trigger updates across
               integrated systems (Payroll, Benefits, Slack, etc.). Some changes cannot be undone.
             </AlertDescription>
           </Alert>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card>
+            <Card className="border-gray-100 rounded-xl shadow-sm">
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
                   <Users className="h-5 w-5" />
@@ -132,7 +143,7 @@ export function ChangePreview({ selectedEmployees, changeData, onBack, onConfirm
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="border-gray-100 rounded-xl shadow-sm">
               <CardHeader>
                 <CardTitle>Changes to Apply</CardTitle>
               </CardHeader>
@@ -165,9 +176,12 @@ export function ChangePreview({ selectedEmployees, changeData, onBack, onConfirm
             </Card>
           </div>
 
-          <Card className="border-orange-200 bg-orange-50">
+          <Card className="border-amber-200 bg-amber-50 rounded-xl">
             <CardHeader>
-              <CardTitle className="text-orange-800">System Impact</CardTitle>
+              <CardTitle className="text-amber-800 flex items-center space-x-2">
+                <AlertTriangle className="h-5 w-5" />
+                <span>System Impact</span>
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
@@ -189,11 +203,14 @@ export function ChangePreview({ selectedEmployees, changeData, onBack, onConfirm
         </div>
       </div>
 
-      <div className="flex justify-between">
-        <Button variant="outline" onClick={onBack}>
+      <div className="flex justify-between pt-6">
+        <Button variant="outline" onClick={onBack} className="px-8 py-3 rounded-xl text-base h-auto border-gray-200">
           Back to Edit
         </Button>
-        <Button onClick={onConfirm} className="bg-red-600 hover:bg-red-700 text-white">
+        <Button
+          onClick={onConfirm}
+          className="bg-red-500 hover:bg-red-600 text-white font-semibold px-8 py-3 rounded-xl text-base h-auto"
+        >
           Apply Changes to {selectedEmployees.length} Employee{selectedEmployees.length !== 1 ? "s" : ""}
         </Button>
       </div>

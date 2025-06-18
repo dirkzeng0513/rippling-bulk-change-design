@@ -12,50 +12,39 @@ interface ProgressTrackerProps {
 
 export function ProgressTracker({ steps }: ProgressTrackerProps) {
   return (
-    <nav aria-label="Progress">
-      <ol className="flex items-center">
+    <nav aria-label="Progress" className="mb-12">
+      <ol className="flex items-center justify-between max-w-4xl mx-auto">
         {steps.map((step, stepIdx) => (
-          <li key={step.name} className={`${stepIdx !== steps.length - 1 ? "pr-8 sm:pr-20" : ""} relative`}>
-            {step.status === "complete" ? (
-              <>
-                <div className="absolute inset-0 flex items-center" aria-hidden="true">
-                  <div className="h-0.5 w-full bg-blue-600" />
+          <li key={step.name} className="relative flex flex-col items-center">
+            <div className="flex items-center">
+              {stepIdx !== 0 && (
+                <div className="absolute right-full w-24 sm:w-32 h-0.5 bg-gray-200 -translate-x-5">
+                  {step.status === "complete" && <div className="h-full bg-amber-400" />}
                 </div>
-                <div className="relative w-8 h-8 flex items-center justify-center bg-blue-600 rounded-full hover:bg-blue-900">
-                  <Check className="w-5 h-5 text-white" aria-hidden="true" />
+              )}
+
+              {step.status === "complete" ? (
+                <div className="relative w-10 h-10 flex items-center justify-center bg-amber-400 rounded-full z-10">
+                  <Check className="w-5 h-5 text-gray-900" aria-hidden="true" />
                   <span className="sr-only">{step.name}</span>
                 </div>
-              </>
-            ) : step.status === "current" ? (
-              <>
-                <div className="absolute inset-0 flex items-center" aria-hidden="true">
-                  <div className="h-0.5 w-full bg-gray-200" />
-                </div>
+              ) : step.status === "current" ? (
                 <div
-                  className="relative w-8 h-8 flex items-center justify-center bg-white border-2 border-blue-600 rounded-full"
+                  className="relative w-10 h-10 flex items-center justify-center bg-white border-2 border-amber-400 rounded-full z-10"
                   aria-current="step"
                 >
-                  <span className="h-2.5 w-2.5 bg-blue-600 rounded-full" aria-hidden="true" />
+                  <span className="h-3 w-3 bg-amber-400 rounded-full" aria-hidden="true" />
                   <span className="sr-only">{step.name}</span>
                 </div>
-              </>
-            ) : (
-              <>
-                <div className="absolute inset-0 flex items-center" aria-hidden="true">
-                  <div className="h-0.5 w-full bg-gray-200" />
-                </div>
-                <div className="group relative w-8 h-8 flex items-center justify-center bg-white border-2 border-gray-300 rounded-full hover:border-gray-400">
-                  <span
-                    className="h-2.5 w-2.5 bg-transparent rounded-full group-hover:bg-gray-300"
-                    aria-hidden="true"
-                  />
+              ) : (
+                <div className="group relative w-10 h-10 flex items-center justify-center bg-white border-2 border-gray-300 rounded-full hover:border-gray-400 z-10">
+                  <span className="h-3 w-3 bg-transparent rounded-full group-hover:bg-gray-300" aria-hidden="true" />
                   <span className="sr-only">{step.name}</span>
                 </div>
-              </>
-            )}
-            <span className="absolute top-10 left-1/2 transform -translate-x-1/2 text-xs font-medium text-gray-500 whitespace-nowrap">
-              {step.name}
-            </span>
+              )}
+            </div>
+
+            <span className="mt-4 text-sm font-medium text-gray-700 text-center max-w-24">{step.name}</span>
           </li>
         ))}
       </ol>

@@ -2,14 +2,18 @@
 
 import { useState } from "react"
 import { EmployeeSelection } from "@/components/employee-selection"
-import { BulkChangeForm } from "@/components/bulk-change-form"
-import { ChangePreview } from "@/components/change-preview"
+import { FieldSelection } from "@/components/field-selection"
+import { ValidationPreview } from "@/components/validation-preview"
+import { ApprovalFlow } from "@/components/approval-flow"
 import { ProgressTracker } from "@/components/progress-tracker"
+import { RipplingHeader } from "@/components/rippling-header"
 
-export default function BulkChangePage() {
+export default function UpdateEmployeeInformationPage() {
   const [currentStep, setCurrentStep] = useState(1)
   const [selectedEmployees, setSelectedEmployees] = useState<string[]>([])
+  const [selectedFields, setSelectedFields] = useState<string[]>([])
   const [changeData, setChangeData] = useState<any>({})
+  const [editMode, setEditMode] = useState<"manual" | "csv">("manual")
 
   const steps = [
     {
@@ -24,27 +28,43 @@ export default function BulkChangePage() {
     },
     {
       id: 3,
-      name: "Review & Confirm",
+      name: "Validation & Preview",
       status: currentStep > 3 ? "complete" : currentStep === 3 ? "current" : "upcoming",
     },
-    { id: 4, name: "Execute Changes", status: currentStep === 4 ? "current" : "upcoming" },
+    {
+      id: 4,
+      name: "Approval & Submit",
+      status: currentStep === 4 ? "current" : "upcoming",
+    },
   ]
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="bg-white border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="py-6">
-            <h1 className="text-2xl font-semibold text-gray-900">Bulk Employee Changes</h1>
-            <p className="mt-1 text-sm text-gray-500">Make changes to multiple employees at once</p>
+      <RipplingHeader />
+
+      <div className="bg-white border-b border-gray-100">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="py-8">
+            <nav className="text-sm text-gray-500 mb-4">
+              <span>People</span> <span className="mx-2">›</span>
+              <span>Bulk Actions</span> <span className="mx-2">›</span>
+              <span className="text-gray-900 font-medium">Update Employee Information</span>
+            </nav>
+            <div className="max-w-3xl">
+              <h1 className="text-4xl font-bold text-gray-900 leading-tight">Update employee information</h1>
+              <p className="mt-4 text-xl text-gray-600 leading-relaxed">
+                Update multiple employee records at once through manual editing or CSV upload. Advanced filtering and
+                natural language queries supported.
+              </p>
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-6 lg:px-8 py-12">
         <ProgressTracker steps={steps} />
 
-        <div className="mt-8">
+        <div className="mt-12">
           {currentStep === 1 && (
             <EmployeeSelection
               selectedEmployees={selectedEmployees}
@@ -54,30 +74,36 @@ export default function BulkChangePage() {
           )}
 
           {currentStep === 2 && (
-            <BulkChangeForm
+            <FieldSelection
               selectedEmployees={selectedEmployees}
+              selectedFields={selectedFields}
+              onFieldsChange={setSelectedFields}
               changeData={changeData}
               onChangeDataUpdate={setChangeData}
+              editMode={editMode}
+              onEditModeChange={setEditMode}
               onBack={() => setCurrentStep(1)}
               onNext={() => setCurrentStep(3)}
             />
           )}
 
           {currentStep === 3 && (
-            <ChangePreview
+            <ValidationPreview
               selectedEmployees={selectedEmployees}
+              selectedFields={selectedFields}
               changeData={changeData}
               onBack={() => setCurrentStep(2)}
-              onConfirm={() => setCurrentStep(4)}
+              onNext={() => setCurrentStep(4)}
             />
           )}
 
           {currentStep === 4 && (
-            <div className="text-center py-12">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-              <p className="mt-4 text-lg font-medium text-gray-900">Processing bulk changes...</p>
-              <p className="text-sm text-gray-500">This may take a few minutes</p>
-            </div>
+            <ApprovalFlow
+              selectedEmployees={selectedEmployees}
+              selectedFields={selectedFields}
+              changeData={changeData}
+              onBack={() => setCurrentStep(3)}
+            />
           )}
         </div>
       </div>
