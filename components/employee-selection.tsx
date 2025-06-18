@@ -23,6 +23,7 @@ import {
   Info,
   Code,
   Eye,
+  Settings,
 } from "lucide-react"
 import { processNaturalLanguageQuery } from "@/app/actions/natural-language-query"
 
@@ -63,27 +64,7 @@ type SortDirection = "asc" | "desc" | null
 // Generate 100 mock employees
 const generateMockEmployees = (): Employee[] => {
   const departments = ["EPD", "Product Marketing", "Sales", "Commercial", "Legal", "Customer Success"]
-  const jobTitles = [
-    "Software Engineer",
-    "Senior Software Engineer",
-    "Staff Software Engineer",
-    "Principal Engineer",
-    "Product Manager",
-    "Senior Product Manager",
-    "Director of Product",
-    "Marketing Manager",
-    "Senior Marketing Manager",
-    "Marketing Director",
-    "Account Executive",
-    "Senior Account Executive",
-    "Sales Director",
-    "Legal Counsel",
-    "Senior Legal Counsel",
-    "General Counsel",
-    "Customer Success Manager",
-    "Senior Customer Success Manager",
-    "VP Customer Success",
-  ]
+  const jobTitles = ["IC", "Manager", "Sr.Manager", "Director", "Sr.Director", "VP", "Executive"]
   const locations = ["San Francisco", "New York", "Chicago", "Austin", "Remote", "Seattle", "Boston", "Los Angeles"]
   const managers = [
     "David Kim",
@@ -190,29 +171,21 @@ export function EmployeeSelection({ selectedEmployees, onSelectionChange, onNext
   const [sortField, setSortField] = useState<SortField | null>(null)
   const [sortDirection, setSortDirection] = useState<SortDirection>(null)
   const [showQuerySyntax, setShowQuerySyntax] = useState(false)
+  const [showConfigModal, setShowConfigModal] = useState(false)
+  const [tableColumns, setTableColumns] = useState([
+    { key: "name", label: "Name", enabled: true, sortable: true },
+    { key: "email", label: "Email", enabled: true, sortable: false },
+    { key: "employeeId", label: "Employee ID", enabled: true, sortable: true },
+    { key: "department", label: "Department", enabled: true, sortable: true },
+    { key: "startDate", label: "Start Date", enabled: true, sortable: true },
+    { key: "jobTitle", label: "Job Title", enabled: true, sortable: true },
+    { key: "location", label: "Location", enabled: true, sortable: true },
+    { key: "jobLevel", label: "Job Level", enabled: false, sortable: true },
+    { key: "bonusTarget", label: "Bonus Target", enabled: false, sortable: true },
+  ])
 
   const departments = ["EPD", "Product Marketing", "Sales", "Commercial", "Legal", "Customer Success"]
-  const jobTitles = [
-    "Software Engineer",
-    "Senior Software Engineer",
-    "Staff Software Engineer",
-    "Principal Engineer",
-    "Product Manager",
-    "Senior Product Manager",
-    "Director of Product",
-    "Marketing Manager",
-    "Senior Marketing Manager",
-    "Marketing Director",
-    "Account Executive",
-    "Senior Account Executive",
-    "Sales Director",
-    "Legal Counsel",
-    "Senior Legal Counsel",
-    "General Counsel",
-    "Customer Success Manager",
-    "Senior Customer Success Manager",
-    "VP Customer Success",
-  ]
+  const jobTitles = ["IC", "Manager", "Sr.Manager", "Director", "Sr.Director", "VP", "Executive"]
 
   const locations = ["San Francisco", "New York", "Chicago", "Austin", "Remote", "Seattle", "Boston", "Los Angeles"]
 
@@ -517,6 +490,45 @@ export function EmployeeSelection({ selectedEmployees, onSelectionChange, onNext
     clearNaturalLanguageFilters()
   }
 
+  const getJobLevel = (jobTitle: string) => {
+    const levelMap: Record<string, string> = {
+      IC: "L4",
+      Manager: "M1",
+      "Sr.Manager": "M2",
+      Director: "M3",
+      "Sr.Director": "M4",
+      VP: "M5",
+      Executive: "M6",
+    }
+    return levelMap[jobTitle] || "L4"
+  }
+
+  const getBonusTarget = (jobTitle: string) => {
+    const bonusMap: Record<string, string> = {
+      IC: "10%",
+      Manager: "15%",
+      "Sr.Manager": "20%",
+      Director: "25%",
+      "Sr.Director": "30%",
+      VP: "40%",
+      Executive: "50%",
+    }
+    return bonusMap[jobTitle] || "10%"
+  }
+
+  const getColumnValue = (employee: Employee, columnKey: string) => {
+    switch (columnKey) {
+      case "jobLevel":
+        return getJobLevel(employee.jobTitle)
+      case "bonusTarget":
+        return getBonusTarget(employee.jobTitle)
+      default:
+        return employee[columnKey as keyof Employee]
+    }
+  }
+
+  const enabledColumns = tableColumns.filter((col) => col.enabled)
+
   return (
     <div className="space-y-6">
       <Card className="border-gray-100 rounded-2xl shadow-sm overflow-hidden">
@@ -548,6 +560,15 @@ export function EmployeeSelection({ selectedEmployees, onSelectionChange, onNext
                   {usingFallback ? "Basic Filter" : "AI Filtered"}
                 </Badge>
               )}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowConfigModal(true)}
+                className="px-3 py-2 text-sm border-gray-200 hover:bg-gray-50"
+              >
+                <Settings className="h-4 w-4 mr-2" />
+                Configure
+              </Button>
             </div>
           </div>
         </CardHeader>
@@ -675,90 +696,94 @@ export function EmployeeSelection({ selectedEmployees, onSelectionChange, onNext
                     {Math.min(currentPage * itemsPerPage, filteredEmployees.length)} of {filteredEmployees.length}
                     {searchTerm || departmentFilter || jobTitleFilter || locationFilter || jobLevelFilter || nlFilters
                       ? " filtered"
-                      : ""}
+                      : ""}{" "}
                     employees
                   </div>
                 </div>
 
+                {/* Table Header */}
+                {/* Table */}
                 <div className="bg-white rounded-lg overflow-hidden border border-gray-200">
-                  <div className="grid grid-cols-7 gap-4 p-4 bg-gray-50 border-b border-gray-200 text-sm font-medium text-gray-700">
-                    <div
-                      className="flex items-center space-x-1 cursor-pointer hover:text-gray-900"
-                      onClick={() => handleSort("name")}
-                    >
-                      <span>Name</span>
-                      {getSortIcon("name")}
-                    </div>
-                    <div className="flex items-center space-x-1">
-                      <span>Email</span>
-                    </div>
-                    <div
-                      className="flex items-center space-x-1 cursor-pointer hover:text-gray-900"
-                      onClick={() => handleSort("employeeId")}
-                    >
-                      <span>Employee ID</span>
-                      {getSortIcon("employeeId")}
-                    </div>
-                    <div
-                      className="flex items-center space-x-1 cursor-pointer hover:text-gray-900"
-                      onClick={() => handleSort("department")}
-                    >
-                      <span>Department</span>
-                      {getSortIcon("department")}
-                    </div>
-                    <div
-                      className="flex items-center space-x-1 cursor-pointer hover:text-gray-900"
-                      onClick={() => handleSort("startDate")}
-                    >
-                      <span>Start Date</span>
-                      {getSortIcon("startDate")}
-                    </div>
-                    <div
-                      className="flex items-center space-x-1 cursor-pointer hover:text-gray-900"
-                      onClick={() => handleSort("jobTitle")}
-                    >
-                      <span>Job Title</span>
-                      {getSortIcon("jobTitle")}
-                    </div>
-                    <div
-                      className="flex items-center space-x-1 cursor-pointer hover:text-gray-900"
-                      onClick={() => handleSort("location")}
-                    >
-                      <span>Location</span>
-                      {getSortIcon("location")}
-                    </div>
-                  </div>
-
-                  <div className="divide-y divide-gray-100">
-                    {paginatedEmployees.map((employee) => (
-                      <div key={employee.id} className="grid grid-cols-7 gap-4 p-4 hover:bg-gray-50 items-center">
-                        <div className="flex items-center space-x-3">
-                          <Checkbox
-                            checked={selectedEmployees.includes(employee.id)}
-                            onCheckedChange={() => handleEmployeeToggle(employee.id)}
-                            className="data-[state=checked]:bg-amber-400 data-[state=checked]:border-amber-400"
-                          />
-                          <div className="flex items-center space-x-2">
-                            <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
-                              <span className="text-xs font-medium text-gray-700">
-                                {employee.name
-                                  .split(" ")
-                                  .map((n) => n[0])
-                                  .join("")}
-                              </span>
+                  {/* Table */}
+                  <table className="w-full table-fixed">
+                    {/* Header */}
+                    <thead className="bg-gray-50 border-b border-gray-200">
+                      <tr>
+                        {enabledColumns.map((column, index) => (
+                          <th
+                            key={column.key}
+                            className={`px-4 py-3 text-left text-sm font-medium text-gray-700 ${
+                              column.sortable ? "cursor-pointer hover:text-gray-900 hover:bg-gray-100" : ""
+                            } ${index === 0 ? "w-64" : "w-auto"}`}
+                            onClick={() => column.sortable && handleSort(column.key as SortField)}
+                          >
+                            <div className="flex items-center justify-start space-x-1">
+                              <span className="text-left">{column.label}</span>
+                              {column.sortable && (
+                                <div className="flex-shrink-0">{getSortIcon(column.key as SortField)}</div>
+                              )}
                             </div>
-                            <span className="font-medium text-gray-900 text-sm">{employee.name}</span>
-                          </div>
-                        </div>
-                        <div className="text-xs text-gray-600 truncate">{employee.email}</div>
-                        <div className="text-xs font-mono text-gray-900">{employee.employeeId}</div>
-                        <div className="text-sm text-gray-900">{employee.department}</div>
-                        <div className="text-xs text-gray-600">{formatDate(employee.startDate)}</div>
-                        <div className="text-sm text-gray-900 truncate">{employee.jobTitle}</div>
-                        <div className="text-sm text-gray-600">{employee.location}</div>
-                      </div>
-                    ))}
-                  </div>
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+
+                    {/* Body */}
+                    <tbody className="bg-white divide-y divide-gray-100">
+                      {paginatedEmployees.map((employee) => (
+                        <tr key={employee.id} className="hover:bg-gray-50 transition-colors">
+                          {enabledColumns.map((column, index) => (
+                            <td key={column.key} className="px-4 py-3 text-left align-top">
+                              {index === 0 ? (
+                                // First column with checkbox and name
+                                <div className="flex items-center justify-start space-x-3">
+                                  <Checkbox
+                                    checked={selectedEmployees.includes(employee.id)}
+                                    onCheckedChange={() => handleEmployeeToggle(employee.id)}
+                                    className="data-[state=checked]:bg-amber-400 data-[state=checked]:border-amber-400 flex-shrink-0"
+                                  />
+                                  <div className="text-left min-w-0 flex-1">
+                                    <div className="font-medium text-gray-900 text-sm truncate text-left">
+                                      {getColumnValue(employee, column.key)}
+                                    </div>
+                                  </div>
+                                </div>
+                              ) : (
+                                // Other columns
+                                <div className="text-left">
+                                  {column.key === "email" ? (
+                                    <div className="text-xs text-gray-600 truncate text-left">
+                                      {getColumnValue(employee, column.key)}
+                                    </div>
+                                  ) : column.key === "employeeId" ? (
+                                    <div className="text-xs font-mono text-gray-900 text-left">
+                                      {getColumnValue(employee, column.key)}
+                                    </div>
+                                  ) : column.key === "startDate" ? (
+                                    <div className="text-xs text-gray-600 text-left">
+                                      {formatDate(employee.startDate)}
+                                    </div>
+                                  ) : column.key === "bonusTarget" ? (
+                                    <div className="text-sm font-medium text-green-600 text-left">
+                                      {getColumnValue(employee, column.key)}
+                                    </div>
+                                  ) : column.key === "jobLevel" ? (
+                                    <div className="text-sm font-medium text-blue-600 text-left">
+                                      {getColumnValue(employee, column.key)}
+                                    </div>
+                                  ) : (
+                                    <div className="text-sm text-gray-900 truncate text-left">
+                                      {getColumnValue(employee, column.key)}
+                                    </div>
+                                  )}
+                                </div>
+                              )}
+                            </td>
+                          ))}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
 
                 {/* Pagination */}
@@ -962,41 +987,65 @@ export function EmployeeSelection({ selectedEmployees, onSelectionChange, onNext
                     </CardHeader>
                     <CardContent>
                       <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-                        <div className="grid grid-cols-6 gap-4 p-3 bg-gray-50 border-b border-gray-200 text-xs font-medium text-gray-700">
-                          <div>Name</div>
-                          <div>Employee ID</div>
-                          <div>Department</div>
-                          <div>Job Title</div>
-                          <div>Location</div>
-                          <div>Start Date</div>
-                        </div>
-                        <div className="divide-y divide-gray-100 max-h-80 overflow-y-auto">
-                          {advancedFilteredEmployees.slice(0, 5).map((employee) => (
-                            <div key={employee.id} className="grid grid-cols-6 gap-4 p-3 hover:bg-gray-50 items-center">
-                              <div className="flex items-center space-x-2">
-                                <div className="w-6 h-6 bg-gray-200 rounded-full flex items-center justify-center">
-                                  <span className="text-xs font-medium text-gray-700">
-                                    {employee.name
-                                      .split(" ")
-                                      .map((n) => n[0])
-                                      .join("")}
-                                  </span>
-                                </div>
-                                <span className="font-medium text-gray-900 text-sm truncate">{employee.name}</span>
-                              </div>
-                              <div className="text-xs font-mono text-gray-900">{employee.employeeId}</div>
-                              <div className="text-sm text-gray-900">{employee.department}</div>
-                              <div className="text-sm text-gray-900 truncate">{employee.jobTitle}</div>
-                              <div className="text-sm text-gray-600">{employee.location}</div>
-                              <div className="text-xs text-gray-600">{formatDate(employee.startDate)}</div>
-                            </div>
-                          ))}
-                          {advancedFilteredEmployees.length > 5 && (
-                            <div className="p-3 text-center text-sm text-gray-500 bg-gray-50">
-                              +{advancedFilteredEmployees.length - 5} more employees match your criteria
-                            </div>
-                          )}
-                        </div>
+                        <table className="w-full table-fixed">
+                          <thead className="bg-gray-50 border-b border-gray-200">
+                            <tr>
+                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 w-48">Name</th>
+                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 w-32">
+                                Employee ID
+                              </th>
+                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 w-40">Department</th>
+                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 w-32">Job Title</th>
+                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 w-32">Location</th>
+                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 w-28">Start Date</th>
+                            </tr>
+                          </thead>
+                          <tbody className="bg-white divide-y divide-gray-100">
+                            {advancedFilteredEmployees.slice(0, 5).map((employee) => (
+                              <tr key={employee.id} className="hover:bg-gray-50">
+                                <td className="px-4 py-3 text-left">
+                                  <div className="flex items-center justify-start space-x-2">
+                                    <div className="w-6 h-6 bg-gray-200 rounded-full flex items-center justify-center flex-shrink-0">
+                                      <span className="text-xs font-medium text-gray-700">
+                                        {employee.name
+                                          .split(" ")
+                                          .map((n) => n[0])
+                                          .join("")}
+                                      </span>
+                                    </div>
+                                    <div className="text-left min-w-0 flex-1">
+                                      <span className="font-medium text-gray-900 text-sm truncate text-left block">
+                                        {employee.name}
+                                      </span>
+                                    </div>
+                                  </div>
+                                </td>
+                                <td className="px-4 py-3 text-left">
+                                  <div className="text-xs font-mono text-gray-900 text-left">{employee.employeeId}</div>
+                                </td>
+                                <td className="px-4 py-3 text-left">
+                                  <div className="text-sm text-gray-900 text-left truncate">{employee.department}</div>
+                                </td>
+                                <td className="px-4 py-3 text-left">
+                                  <div className="text-sm text-gray-900 text-left truncate">{employee.jobTitle}</div>
+                                </td>
+                                <td className="px-4 py-3 text-left">
+                                  <div className="text-sm text-gray-600 text-left truncate">{employee.location}</div>
+                                </td>
+                                <td className="px-4 py-3 text-left">
+                                  <div className="text-xs text-gray-600 text-left">
+                                    {formatDate(employee.startDate)}
+                                  </div>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                        {advancedFilteredEmployees.length > 5 && (
+                          <div className="px-4 py-3 text-center text-sm text-gray-500 bg-gray-50 border-t border-gray-100">
+                            +{advancedFilteredEmployees.length - 5} more employees match your criteria
+                          </div>
+                        )}
                       </div>
                       {advancedFilteredEmployees.length > 0 && (
                         <div className="mt-4 flex justify-center">
@@ -1046,6 +1095,103 @@ export function EmployeeSelection({ selectedEmployees, onSelectionChange, onNext
           Continue with {selectedEmployees.length} employee{selectedEmployees.length !== 1 ? "s" : ""}
         </Button>
       </div>
+
+      {/* Configuration Modal */}
+      {showConfigModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl p-6 w-96 max-h-[80vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-900">Configure Table Columns</h3>
+              <Button variant="ghost" size="sm" onClick={() => setShowConfigModal(false)} className="p-1">
+                ✕
+              </Button>
+            </div>
+
+            <div className="space-y-3">
+              <p className="text-sm text-gray-600 mb-4">
+                Select which columns to display in the employee table. You can show up to 7 columns at once.
+              </p>
+
+              {tableColumns.map((column) => (
+                <div
+                  key={column.key}
+                  className="flex items-center justify-between p-3 border border-gray-200 rounded-lg"
+                >
+                  <div className="flex items-center space-x-3">
+                    <Checkbox
+                      checked={column.enabled}
+                      onCheckedChange={(checked) => {
+                        const enabledCount = tableColumns.filter((col) => col.enabled).length
+                        if (checked && enabledCount >= 7) {
+                          return // Don't allow more than 7 columns
+                        }
+                        if (!checked && enabledCount <= 3) {
+                          return // Don't allow less than 3 columns
+                        }
+                        setTableColumns((prev) =>
+                          prev.map((col) => (col.key === column.key ? { ...col, enabled: checked as boolean } : col)),
+                        )
+                      }}
+                      className="data-[state=checked]:bg-amber-400 data-[state=checked]:border-amber-400"
+                    />
+                    <div>
+                      <div className="font-medium text-gray-900">{column.label}</div>
+                      {(column.key === "jobLevel" || column.key === "bonusTarget") && (
+                        <div className="text-xs text-gray-500">
+                          {column.key === "jobLevel" ? "Calculated from job title" : "Target bonus percentage"}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  {column.sortable && (
+                    <Badge variant="outline" className="text-xs">
+                      Sortable
+                    </Badge>
+                  )}
+                </div>
+              ))}
+
+              <div className="mt-6 flex justify-between items-center">
+                <div className="text-sm text-gray-500">
+                  {tableColumns.filter((col) => col.enabled).length} of 7 columns selected
+                </div>
+                <div className="flex space-x-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      // Reset to default
+                      setTableColumns((prev) =>
+                        prev.map((col) => ({
+                          ...col,
+                          enabled: [
+                            "name",
+                            "email",
+                            "employeeId",
+                            "department",
+                            "startDate",
+                            "jobTitle",
+                            "location",
+                          ].includes(col.key),
+                        })),
+                      )
+                    }}
+                  >
+                    Reset Default
+                  </Button>
+                  <Button
+                    size="sm"
+                    onClick={() => setShowConfigModal(false)}
+                    className="bg-amber-400 hover:bg-amber-500 text-gray-900"
+                  >
+                    Apply Changes
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

@@ -30,15 +30,20 @@ function parseChangesWithFallback(query: string) {
 
   // Parse common change patterns
   if (lowerQuery.includes("promote") || lowerQuery.includes("promotion")) {
-    if (lowerQuery.includes("senior")) {
-      changes.push({ field: "jobTitle", value: "Senior Software Engineer" })
+    if (lowerQuery.includes("senior") || lowerQuery.includes("sr")) {
+      changes.push({ field: "jobTitle", value: "Sr.Manager" })
       changes.push({ field: "level", value: "L5" })
-      sqlParts.push("job_title = 'Senior Software Engineer'", "level = 'L5'")
+      sqlParts.push("job_title = 'Sr.Manager'", "level = 'L5'")
     }
     if (lowerQuery.includes("manager")) {
       changes.push({ field: "jobTitle", value: "Manager" })
       changes.push({ field: "level", value: "M1" })
       sqlParts.push("job_title = 'Manager'", "level = 'M1'")
+    }
+    if (lowerQuery.includes("director")) {
+      changes.push({ field: "jobTitle", value: "Director" })
+      changes.push({ field: "level", value: "M2" })
+      sqlParts.push("job_title = 'Director'", "level = 'M2'")
     }
   }
 
@@ -121,7 +126,7 @@ export async function processNaturalLanguageChanges(query: string, selectedEmplo
       system: `You are an HR system assistant that converts natural language change requests into structured employee updates.
 
 Available fields to modify:
-- jobTitle: Job titles like "Software Engineer", "Senior Software Engineer", "Manager", "Director"
+- jobTitle: Job titles like "IC", "Manager", "Sr.Manager", "Director", "Sr.Director", "VP", "Executive"
 - level: Levels like "L3", "L4", "L5", "L6", "L7", "M1", "M2", "M3"
 - department: Departments like "EPD", "Product Marketing", "Sales", "Commercial", "Legal", "Customer Success"
 - baseCompensation: Compensation bands like "Band 1", "Band 2", "Band 3"

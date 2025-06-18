@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button"
+import Image from "next/image"
 
 export function RipplingHeader() {
   return (
@@ -7,10 +8,7 @@ export function RipplingHeader() {
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
             <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gray-900 rounded flex items-center justify-center">
-                <span className="text-white font-bold text-sm">R</span>
-              </div>
-              <span className="text-xl font-bold text-gray-900 tracking-tight">RIPPLING</span>
+              <Image src="/rippling-logo.png" alt="Rippling" width={120} height={32} className="h-8 w-auto" priority />
             </div>
           </div>
 
