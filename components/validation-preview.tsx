@@ -420,7 +420,7 @@ export function ValidationPreview({
           onClick={onNext}
           className="bg-amber-400 hover:bg-amber-500 text-gray-900 font-semibold px-8 py-3 rounded-xl text-base h-auto"
         >
-          Submit for Approval
+          Continue
         </Button>
       </div>
     </div>
